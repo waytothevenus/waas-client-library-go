@@ -224,3 +224,13 @@ func (m *mpcTransactionServiceClient) ListMPCTransactions(
 	opts ...gax.CallOption) MPCTransactionIterator {
 	return &mpcTransactionIteratorImpl{iter: m.client.ListMPCTransactions(ctx, req, opts...)}
 }
+
+// GetOperation returns the longrunning operation indicated by the given request.
+func (m *MPCTransactionServiceClient) GetOperation(
+	ctx context.Context,
+	req *longrunningpb.GetOperationRequest,
+	opts ...gax.CallOption) (*longrunningpb.Operation, error) {
+	operation, err := m.client.LROClient.GetOperation(ctx, req, opts...)
+
+	return operation, clients.UnwrapError(err)
+}
