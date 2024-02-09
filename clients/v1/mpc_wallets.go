@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
+	lroauto "cloud.google.com/go/longrunning/autogen"
 	"cloud.google.com/go/longrunning/autogen/longrunningpb"
 	"github.com/coinbase/waas-client-library-go/clients"
 	innerClient "github.com/coinbase/waas-client-library-go/gen/go/coinbase/cloud/clients/v1"
@@ -25,6 +26,7 @@ const (
 // mpcWalletServiceClient is the client to use to access WaaS MPCWalletService APIs.
 type mpcWalletServiceClient struct {
 	client     *innerClient.MPCWalletClient
+	lroClient  *lroauto.OperationsClient
 	pathPrefix string
 }
 
@@ -48,6 +50,11 @@ func NewMPCWalletServiceClient(
 		return nil, err
 	}
 
+	lroClient, err := lroauto.NewOperationsRESTClient(ctx, clientOptions...)
+	if err != nil {
+		return nil, err
+	}
+
 	baseURL, err := url.Parse(config.Endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse passed endpoint %s: %v", config.Endpoint, err)
@@ -55,6 +62,7 @@ func NewMPCWalletServiceClient(
 
 	return &mpcWalletServiceClient{
 		client:     innerClient,
+		lroClient:  lroClient,
 		pathPrefix: baseURL.Path,
 	}, nil
 }
@@ -405,7 +413,7 @@ func (m *MPCWalletServiceClient) GetOperation(
 	ctx context.Context,
 	req *longrunningpb.GetOperationRequest,
 	opts ...gax.CallOption) (*longrunningpb.Operation, error) {
-	operation, err := m.client.LROClient.GetOperation(ctx, req, opts...)
+	operation, err := m.lroClient.GetOperation(ctx, req, opts...)
 
 	return operation, clients.UnwrapError(err)
 }
