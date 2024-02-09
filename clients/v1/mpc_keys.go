@@ -564,3 +564,13 @@ func (m *mpcKeyServiceClient) RevokeDevice(
 
 	return clients.UnwrapError(err)
 }
+
+// GetOperation returns the longrunning operation indicated by the given request.
+func (m *MPCKeyServiceClient) GetOperation(
+	ctx context.Context,
+	req *longrunningpb.GetOperationRequest,
+	opts ...gax.CallOption) (*longrunningpb.Operation, error) {
+	operation, err := m.client.LROClient.GetOperation(ctx, req, opts...)
+
+	return operation, clients.UnwrapError(err)
+}
